@@ -152,7 +152,7 @@ def kpids_to_matches0(kpt_ids0, kpt_ids1, scores):
 
     # Remove n-to-1 matches
     matches, scores = get_unique_matches(matches, scores)
-    return matches_to_matches0(matches, scores)
+    return matches, scores, matches_to_matches0(matches, scores)
 
 
 def scale_keypoints(kpts, scale):
@@ -398,11 +398,13 @@ def aggregate_matches(
             )
 
             # Build matches from assignments
-            matches0, scores0 = kpids_to_matches0(mkp_ids0, mkp_ids1, scores)
+            matches_doppel, scores_doppel, matches0, scores0 = kpids_to_matches0(mkp_ids0, mkp_ids1, scores)
 
             assert kpts0.shape[0] == scores.shape[0]
             grp.create_dataset("matches0", data=matches0)
             grp.create_dataset("matching_scores0", data=scores0)
+            grp.create_dataset("matches_doppel", data=matches_doppel)
+            grp.create_dataset("matching_scores_doppel", data=scores_doppel)
 
             # Convert bins to kps if finished, and store them
             for name in (name0, name1):
@@ -460,12 +462,14 @@ def assign_matches(
             mkp_ids0 = assign_keypoints(kpts0, keypoints[name0], max_error)
             mkp_ids1 = assign_keypoints(kpts1, keypoints[name1], max_error)
 
-            matches0, scores0 = kpids_to_matches0(mkp_ids0, mkp_ids1, scores)
+            matches_doppel, scores_doppel, matches0, scores0 = kpids_to_matches0(mkp_ids0, mkp_ids1, scores)
 
             # overwrite matches0 and matching_scores0
             del grp["matches0"], grp["matching_scores0"]
             grp.create_dataset("matches0", data=matches0)
             grp.create_dataset("matching_scores0", data=scores0)
+            grp.create_dataset("matches_doppel", data=matches_doppel)
+            grp.create_dataset("matching_scores_doppel", data=scores_doppel)
 
 
 @torch.no_grad()
