@@ -398,7 +398,7 @@ def aggregate_matches(
             )
 
             # Build matches from assignments
-            matches_doppel, scores_doppel, matches0, scores0 = kpids_to_matches0(mkp_ids0, mkp_ids1, scores)
+            matches_doppel, scores_doppel, (matches0, scores0) = kpids_to_matches0(mkp_ids0, mkp_ids1, scores)
 
             assert kpts0.shape[0] == scores.shape[0]
             grp.create_dataset("matches0", data=matches0)
@@ -462,7 +462,7 @@ def assign_matches(
             mkp_ids0 = assign_keypoints(kpts0, keypoints[name0], max_error)
             mkp_ids1 = assign_keypoints(kpts1, keypoints[name1], max_error)
 
-            matches_doppel, scores_doppel, matches0, scores0 = kpids_to_matches0(mkp_ids0, mkp_ids1, scores)
+            matches_doppel, scores_doppel, (matches0, scores0) = kpids_to_matches0(mkp_ids0, mkp_ids1, scores)
 
             # overwrite matches0 and matching_scores0
             del grp["matches0"], grp["matching_scores0"]
